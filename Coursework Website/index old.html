@@ -1,0 +1,65 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="roboto-mono" href="https://fonts.google.com/specimen/Roboto+Mono">
+    <title>Testing Webpage</title>
+</head>
+<body>
+    <h1>Welcome to the testing of my webpage</h1>
+    <img src="images/twistItLogo.png" alt="Twist It Logo" class="logo">
+    <div>
+        <form> 
+            <!-- br causes a line break! -->
+            <label for="collectionName">collectionName:</label> <br>
+            <input type="text" id="collectionName" name="collectionName"> <br>
+
+            <label for="username">Username:</label> <br>
+            <input type="text" id="username" name="username"> <br>
+
+            <!-- a text area is a larger input field, can be resized by the user -->
+            <label for="response">response:</label> <br>
+            <textarea name="message" rows="10" cols="30" id="response" name="username">
+            
+            </textarea> <br>
+
+            <button type="button" id="button" name="button">Click Me!</button>
+
+            <input type="submit" value="submit">
+        </form>
+    </div>
+    
+    <div class = "output">
+        <p></p>
+    </div>
+
+    <div class="buttons">
+
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // this is my firebase configuration which gets shared when you turn the project into a web app
+        const firebaseConfig = {
+            apiKey: "AIzaSyDhIDaphyTwmDdSxYc3b0T8wieFCGJEYBU",
+            authDomain: "twist-it-game.firebaseapp.com",
+            projectId: "twist-it-game",
+            storageBucket: "twist-it-game.appspot.com",
+            messagingSenderId: "937518741671",
+            appId: "1:937518741671:web:9ca2dfa5fefcc71fd7c382",
+            measurementId: "G-WXEKLY6CV2"
+        };
+
+        //initialising firebase, as well as making it so that I can refer to my firestore database as just db
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();  
+    </script>
+    
+    <script src="script.js"></script>
+    <!--<script src="getdataTest.js"></script>-->
+
+</body>
+</html>

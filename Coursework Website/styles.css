@@ -1,0 +1,80 @@
+h1 {
+    text-align: center;
+}
+
+body { 
+    font-family: 'Roboto Mono', monospace;
+    
+    font-weight: bold;
+    /*font-style: italic;*/
+
+    background-color: #ffffff;
+    overflow: hidden;
+}
+
+div { 
+    display: block;
+    text-align: center;
+}
+
+.logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 150px;
+    height: auto;
+    margin-bottom: 0px;
+    margin-top: 100px;
+
+    /* background-color: rgba(255, 255, 255, 0.3);
+    
+    
+    box-shadow: 0 0 100px #ffffff; */
+}
+
+.bg{
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1; 
+}
+
+.background {
+    width: 300%;
+    height: auto;
+    object-fit: cover;
+    margin: -100%;
+    opacity: 65%;
+    margin-top: -150%;
+    
+    position: relative;
+    top: 150px;
+    /* transform: rotate(4deg); */
+}
+
+form {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    margin-top: 3%;
+    
+
+}
+
+button {
+    font-family: 'Roboto Mono', monospace;
+    
+    font-weight: normal;
+}
+
+input {
+    font-family: 'Roboto Mono', monospace;
+    
+    font-weight: 600;
+    margin-bottom: 8%;
+
+}
