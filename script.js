@@ -302,7 +302,7 @@ form.addEventListener('submit', e => {
                     {
                         console.log('user rejoined');
                         //roomCode = form.collectionName.value;
-                        updateGamePhase(3); //this will update to whatever phase the game is at the time, but for now this will be one
+                        updateGamePhase(2); //this will update to whatever phase the game is at the time, but for now this will be one
 
 
                         newRealtimeListener();
@@ -322,7 +322,7 @@ form.addEventListener('submit', e => {
                             navbarCode.innerHTML = form.collectionName.value;
                             navbarName.innerHTML = form.username.value;
 
-                            updateGamePhase(3); //gamephase 1
+                            updateGamePhase(2); //gamephase 1
                             setTimeout(deleteOldDoc, 5000);
                             return;
                         }).catch(err => {
