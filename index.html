@@ -17,24 +17,25 @@
     
     
     <div id ="signup">
-        <form> 
+        <form class="signup"> 
             <!-- br causes a line break! -->
 
             <label for="username">Name:</label> <br>
-            <input type="text" id="username" name="username"> <br>
+            <input required type="text" id="username" name="username" minlength="3" maxlength="12"> <br>
 
             <label for="collectionName">Room code:</label> <br>
-            <input type="text" id="collectionName" name="collectionName"> <br>
+            <input type="text" id="collectionName" name="collectionName" minlength="4" maxlength="4"> <br>
 
 
             <input type="submit" value="Join game!">
         </form>
     </div>
 
-    <div id ="pregame">
-        <h4>pre game</h4>
+    <div id ="waiting">
         <br>
-        <p>waiting for players!</p>
+        <p id="funnymessage">pre game</p>
+        <br>
+        <p>Waiting for players...</p>
     </div>
     
     <div class = "output">
@@ -45,6 +46,33 @@
 
     <div class="buttons">
 
+    </div>
+
+    <div id ="answersubmission">
+        
+        <form class = "responsesubmit"> 
+            <p>Prompt</p>
+            <textarea required maxlength="100" rows="5" cols="30" id="response" name="response" placeholder="Enter your funniest response here!"></textarea> <br>
+            <br>
+            <input type="submit" value="Submit!"> 
+            <br>
+            <p id="promptsLeft">1/1</p>
+
+        <form> 
+    </div>
+
+    <div id ="voting">
+        <p>Prompt</p>
+        <button class = "option1" id="button1" name="1" type="button">Option1</button> 
+        <br>
+        <button class = "Option2" id="button2" name="2" type="button">Option2</button>
+    </div>
+
+
+    <div id="navbar">
+        <p id="code">Roomcode</p>
+        <p id="name">Name</p>
+        <p id="number">PlayerNumber</p>
     </div>
 
     

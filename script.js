@@ -48,35 +48,192 @@
 //     regions: firebase.firestore.FieldValue.arrayRemove("east_coast")
 // });
 
-const form = document.querySelector('form');
+const form = document.querySelector('.signup');
 const button = document.querySelector('button');
 // you can take a query selector of a specific class
 const text = document.querySelector(".output");
 
 const buttons = document.querySelector(".buttons");
 
+const first = document.querySelector(".option1");
+const second = document.querySelector(".option2");
+
+
+const response = document.querySelector('.responsesubmit');
+
+
 let roomCode = 'ABCD';
-let gamePhase = 0; //0 will be home screen, 1 can be waiting for players
+let gamePhase = 0; //0 will be home screen, 1 can be waiting for players, 2 will be answer submission, 1 will be waiting for players, 3 will be voting
+let myPrompts = []; 
+let allPrompts = [];
+let myNumber = 0;
+
+var fullTurnOrder;
 
 var signup = document.getElementById("signup");
-var pregame = document.getElementById("pregame");
+var waiting = document.getElementById("waiting");
+var answer = document.getElementById("answersubmission");
+var voting = document.getElementById("voting");
 
-let number = '';
+//navbar elements
+var navbar = document.getElementById("navbar");
+var navbarCode = document.getElementById("code");
+var navbarName = document.getElementById("name");
+var navbarNumber = document.getElementById("number");
+
+var funnymsg = document.getElementById("funnymessage");
+
+const aftersubmission = ["Y'know the goal is to be funny, right?",
+    "Not sure if I would have answered like that, but sure", 
+    "It was a bold move writing that", 
+    "You do realise other players are going to see what you just wrote?",
+    "To be fair that last one was kind of funny",
+    "Maybe pass the phone to someone else",
+    "Shoulda put 'my mate dave' for that last one",
+    "Taking your time eh?",
+    "Your shoelace is untied",
+    "Your parents are talking about you right now",
+    "I know your phone passcode",
+    "Found a book you might like: How to grow a sense of humour",
+    "Cards against who?",
+    "Car Hoot?",
+    "Quick Lash?",
+    "Quiz ease?",
+    "You are the reason this game might get banned",
+    "Did you even pass GCSE english",
+    "It's quality over quantity btw",
+    "I might copy that response actually",
+    "That was really funny...",
+    "Your phone screen is dirty"];
+
+const aftervote = ["You sure you voted for the right option?",
+    "Thanks for voting I guess...",
+    "If only people voted like this in elections",
+    "Hard choice?",
+    "Funny stuff",
+    "Hurry up a bit next time pls",
+    "DEMOCRACY!",
+    "THE POWER OF VOTING!",
+    "I was going to vote that one too!",
+    "You don't get a prize for being the slowest to vote btw",
+    "These responses are a LOT funnier than yours..."];
+
+const pregame = ["Well this is exciting, isn't it?",
+    "Is this your first time playing?",
+    "DO NOT play this game.",
+    "Time to get your funny on",
+    "This game is nothing like 'Deal or No Deal'",
+    "Maybe ask the person next to you if you don't know how to play",
+    "Getting bored already?",
+    "Tell people to HURRY UPPP",
+    "Fingertips are reccomended",
+    "I heard the winner gets bragging rights",
+    "Genuine advice: maybe don't keep refreshing the game",
+    "Are you looking forward to embarrassing yourself?",
+    "Click the twist-it logo and something cool might happen",
+    "There is no joke here, I ran out of time"
+]
+
+let responseString = '';
+
+let targetResponses = 2; //how many responses the player will need, constant
+let currentResponse = 1;
+var promptsLeft = document.getElementById("promptsLeft");
+
+let votedfor = 0;
+//let number = '';
+
+let currentlyAnswering = 1;
 
 function updateGamePhase(phase){
     gamePhase = phase;
     if (gamePhase == 0){ //player enter details
         signup.style.display = "block";
-        pregame.style.display = "none";
+        waiting.style.display = "none";
+        navbar.style.display = "none";
+
+        answer.style.display = "none";
+
+        voting.style.display = "none";
     }
     if (gamePhase == 1){ //waiting for other players
         signup.style.display = "none";
-        pregame.style.display = "block"; 
+        waiting.style.display = "block"; 
         text.style.display = "none"; 
+        navbar.style.display = "block";
+
+        answer.style.display = "none";
+
+        voting.style.display = "none";
+    }
+    if (gamePhase == 2){ //answer submission
+        signup.style.display = "none";
+        waiting.style.display = "none"; 
+        text.style.display = "none"; 
+        navbar.style.display = "block";
+        answer.style.display = "block";
+
+        promptsLeft.innerHTML = (currentResponse + "/" + targetResponses);
+    }
+    if (gamePhase == 3){ //vote submission
+        signup.style.display = "none";
+        waiting.style.display = "none"; 
+        text.style.display = "none"; 
+        navbar.style.display = "block";
+        answer.style.display = "none";
+        voting.style.display = "block";
+
     }
 }
 
+function newRealtimeListener()
+{
+    //add code for detatching listeners here, none ye
+    //unsubscribe();
+    //roomCode = form.collectionName.value;
+    roomCode = localStorage.getItem("room")
+    
+    myNumber = localStorage.getItem("playerNumber")
 
+    var unsubscribe = db.collection(roomCode).doc("lobby controller").onSnapshot((doc) => {
+        console.log("subbed to game controller and change made");
+        if(doc.data().GamePhase == 1){
+            allPrompts = doc.data().Prompts;
+            // var leftTurnOrder = doc.data().TurnOrderLeft; // reference to seperate turn orders removed
+            // var rightTurnOrder = doc.data().TurnOrderRight; // reference to seperate turn orders removed
+            fullTurnOrder = doc.data().TurnOrderFull;
+
+            console.log(allPrompts);
+
+
+            // console.log(leftTurnOrder);
+            // console.log(rightTurnOrder);
+            setTimeout(getMyPrompts, 3000);
+            
+        }
+    });
+}
+
+
+function getMyPrompts(){
+    //myNumber = 1;
+    let i = 1;
+    //console.log(allPrompts);
+    fullTurnOrder.forEach(num => {
+        // console.log(num);
+        // console.log("my number is" + myNumber);
+        
+        if (parseInt(myNumber) == parseInt(num)){
+            console.log("thats my number!");
+            //I shouldn't be using num here but instead i
+            myPrompts.push(allPrompts[Math.ceil(parseInt(i)/2)-1]);
+            //myPrompts.push(allPrompts[0]);
+            //console.log(myPrompts);
+        }
+        i++;
+    });
+    console.log(myPrompts);
+}
 
 function roomDoesNotExist(){
     text.innerHTML = 'Room does not exist'; 
@@ -85,8 +242,12 @@ function roomDoesNotExist(){
 function deleteOldDoc(){
     db.collection(localStorage.getItem("room")).doc(localStorage.getItem("name")).get().then((doc) => {
         if (doc.exists) {
-            number = doc.data().PlayerNumber;
-            console.log("I am player " + number)
+            //number = doc.data().PlayerNumber;
+            localStorage.setItem("playerNumber",doc.data().PlayerNumber);
+
+            myNumber = doc.data().PlayerNumber;
+            navbarNumber.innerHTML = myNumber;
+            console.log("I am player " + myNumber)
 
             db.collection(localStorage.getItem("room")).doc(localStorage.getItem("name")).delete().then(() => {
                 console.log("Document successfully deleted!");
@@ -103,10 +264,14 @@ function deleteOldDoc(){
 }
 
 //sets screen to default
+funnymsg.innerHTML = pregame[Math.floor(Math.random()*pregame.length)];
+
 updateGamePhase(0);
 
 form.collectionName.value = localStorage.getItem("room");
 form.username.value = localStorage.getItem("name");
+
+//funnymsg.innerHTML = aftersubmission[Math.floor(Math.random()*aftersubmission.length)];
 
 
 form.addEventListener('submit', e => {
@@ -116,12 +281,14 @@ form.addEventListener('submit', e => {
     // console.log(form.collectionName.value);
     // console.log(form.username.value);
     // console.log(form.response.value);
-    localStorage.setItem("name", form.username.value)
+    
 
     const player = {
         username: form.username.value,
         //response: form.response.value
     };
+
+    console.log(form.username.value);
 
     //checking ig the room exists before adding the player
     db.collection("gameManager").doc("manager").get().then((doc) => {
@@ -131,16 +298,38 @@ form.addEventListener('submit', e => {
                 console.log(lobby);
                 if (form.collectionName.value == lobby)
                 {
-                    db.collection(form.collectionName.value).doc(form.username.value).set(player).then(() => {
-                        console.log('user added');
-                        text.innerHTML = 'user added';
-                        localStorage.setItem("room", form.collectionName.value)
-                        updateGamePhase(1);
-                        setTimeout(deleteOldDoc, 5000);
-                        return;
-                    }).catch(err => {
-                        console.log(err);
-                    });
+                    if(form.collectionName.value == localStorage.getItem("room"))
+                    {
+                        console.log('user rejoined');
+                        //roomCode = form.collectionName.value;
+                        updateGamePhase(3); //this will update to whatever phase the game is at the time, but for now this will be one
+
+
+                        newRealtimeListener();
+
+                    } else{ //this prevents a new player from being made, and instead allows a player to rejoin
+                        db.collection(form.collectionName.value).doc(form.username.value).set(player).then(() => {
+                            console.log('user added');
+                            text.innerHTML = 'user added';
+                            localStorage.setItem("room", form.collectionName.value)
+                            localStorage.setItem("name", form.username.value)
+                            
+                            newRealtimeListener();
+                            
+                            
+                            
+                            
+                            navbarCode.innerHTML = form.collectionName.value;
+                            navbarName.innerHTML = form.username.value;
+
+                            updateGamePhase(3); //gamephase 1
+                            setTimeout(deleteOldDoc, 5000);
+                            return;
+                        }).catch(err => {
+                            console.log(err);
+                        });
+                    }
+                    
                 } else {
                     
                 };
@@ -158,11 +347,83 @@ form.addEventListener('submit', e => {
     {
         //console.log('This room does not exist');
         setTimeout(roomDoesNotExist, 1000);
-        
     }
 
 
 });
+
+//vote buttons
+first.addEventListener('click', e => {
+    console.log('button clicked');
+    //console.log(e.srcElement.id);
+    justVoted(1);
+});
+
+second.addEventListener('click', e => {
+    console.log('button clicked');
+    justVoted(2);
+    //console.log(e.srcElement.id);
+    
+});
+
+function justVoted(number){
+    console.log(number);
+    funnymsg.innerHTML = aftervote[Math.floor(Math.random()*aftervote.length)];
+    updateGamePhase(1);
+    var playerRef = db.collection(localStorage.getItem("room")).doc((0 + localStorage.getItem("playerNumber")).slice(-2));
+    playerRef.update({
+        VotedFor: number
+    });
+}
+
+response.addEventListener('submit', e => {
+    e.preventDefault(); //prevents the page from reloading
+
+    //console.log("response submitted");
+    responseString = response.response.value;
+    console.log(responseString);
+
+    var playerRef = db.collection(localStorage.getItem("room")).doc((0 + localStorage.getItem("playerNumber")).slice(-2));
+    //var playerRef = db.collection("1234").doc("01");
+
+    // Atomically add a new region to the "regions" array field.
+    // playerRef.update({
+    //     Responses: firebase.firestore.FieldValue.arrayUnion(response.response.value)
+    // });
+    playerRef.update({
+        Responses: response.response.value
+    });
+
+
+
+    currentResponse++;
+    response.response.value = "";
+
+    promptsLeft.innerHTML = (currentResponse + "/" + targetResponses);
+
+
+    if (currentResponse > targetResponses)
+    {
+        funnymsg.innerHTML = aftersubmission[Math.floor(Math.random()*aftersubmission.length)];
+        updateGamePhase(1);
+    }
+
+
+    //submit to the right currently answering
+
+    if (currentlyAnswering == 1){
+
+    }
+    else if (currentlyAnswering == 2){
+
+    }
+    else if (currentlyAnswering == 3){
+
+    }
+
+});
+
+
 
 
 
@@ -211,8 +472,8 @@ form.addEventListener('submit', e => {
 // });
 
 
-// real-time listener on JUST documents and not attributes
-// db.collection('cities').onSnapshot(snapshot => {
+//real-time listener on JUST documents and not attributes
+// db.collection(roomCode).doc('lobby controller').onSnapshot(snapshot => {
 //     snapshot.docChanges().forEach(change => {
 //       const doc = change.doc;
 //       if(change.type === 'added'){
@@ -221,9 +482,12 @@ form.addEventListener('submit', e => {
 //       } else if (change.type === 'removed'){
 //         console.log("data rmoeved");
 //         console.log(doc.data());
-//       }
-//     });
+//       } else if (change.type === 'modified'){
+//         console.log("data modified");
+//         console.log(doc.data());
+//     }});
 //   });
+
 
 
 //   <button type="button" id="button" name="button">Click Me!</button>

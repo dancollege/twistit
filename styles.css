@@ -32,6 +32,30 @@ div {
     box-shadow: 0 0 100px #ffffff; */
 }
 
+
+#voting button
+{
+  border: 2px solid black;
+  font-size: small;
+  margin-top: 25px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 50px 75px;
+  transition-duration: 0.4s;
+
+  
+  
+}
+
+#voting button:hover 
+{
+
+  background-color: rgb(170, 146, 244);  
+  
+  /* color: white; */
+  
+}
+
 .bg{
     position: fixed; 
     top: 0;
@@ -62,7 +86,6 @@ form {
     text-align: center;
     margin-top: 3%;
     
-
 }
 
 button {
@@ -73,8 +96,63 @@ button {
 
 input {
     font-family: 'Roboto Mono', monospace;
-    
+    font-size: small;
     font-weight: 600;
     margin-bottom: 8%;
-
+    border: 2px solid black;
 }
+
+
+#funnymessage{
+  font-style: italic;
+  /* font-weight: 400; */
+  font-size: small;
+}
+
+
+/*navbar tutorial*/
+
+/* Place the navbar at the bottom of the page, and make it stick */
+#navbar {
+    background-color: rgba(0, 0, 0, 0.7);
+
+    opacity: 100%;
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    left: 0%;
+    width: 100%;
+  }
+  
+  /* Style the links inside the navigation bar */
+  #navbar p {
+    /* float: left;  */
+    display: block;
+    color: #f2f2f2;
+    /* text-align: center;  */
+    padding: 0px 16px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+
+  #code {
+    float: left;
+  }
+
+  #name {
+    float: right;
+  }
+  #number {
+    float: middle;
+
+  }
+
+  textarea{
+    resize: none;
+    font-family: 'Roboto Mono', monospace;
+    border: 2px solid black;
+    font-size: small;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.7);
+    /* border-radius: 4px; */
+  }
