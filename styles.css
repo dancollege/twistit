@@ -35,14 +35,20 @@ div {
 
 #voting button
 {
+  width: 300px;
+  height: 20%;
+  min-width: 20%;
+
+
   border: 2px solid black;
   font-size: small;
   margin-top: 25px;
   text-align: center;
   background-color: rgba(255, 255, 255, 0.7);
-  padding: 50px 75px;
+  /* padding: 50px 75px; */
+  padding: 10px 15px;
   transition-duration: 0.4s;
-
+  font-size: medium;
   
   
 }
@@ -71,7 +77,7 @@ div {
     height: auto;
     object-fit: cover;
     margin: -100%;
-    opacity: 65%;
+    opacity: 50%;
     margin-top: -150%;
     
     position: relative;
@@ -85,7 +91,21 @@ form {
     margin-right: auto;
     text-align: center;
     margin-top: 3%;
+    padding: 15px 5px;
     
+}
+
+#votingPrompt{
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: large;
+  
+}
+#submittingPrompt{
+  /* padding: 15px 5px; */
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: large;
 }
 
 button {
@@ -107,6 +127,9 @@ input {
   font-style: italic;
   /* font-weight: 400; */
   font-size: small;
+
+  padding-left: 25px;
+  padding-right: 25px;
 }
 
 

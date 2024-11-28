@@ -66,14 +66,18 @@ let roomCode = 'ABCD';
 let gamePhase = 0; //0 will be home screen, 1 can be waiting for players, 2 will be answer submission, 1 will be waiting for players, 3 will be voting
 let myPrompts = []; 
 let allPrompts = [];
+let allResponses = [];
 let myNumber = 0;
 
-var fullTurnOrder;
+
+var fullTurnOrder; //good thing this is here as can be reused for collecting responses
 
 var signup = document.getElementById("signup");
 var waiting = document.getElementById("waiting");
 var answer = document.getElementById("answersubmission");
 var voting = document.getElementById("voting");
+
+
 
 //navbar elements
 var navbar = document.getElementById("navbar");
@@ -82,6 +86,9 @@ var navbarName = document.getElementById("name");
 var navbarNumber = document.getElementById("number");
 
 var funnymsg = document.getElementById("funnymessage");
+var promptText = document.getElementById("submittingPrompt");
+var votingPromptText = document.getElementById("votingPrompt");
+
 
 const aftersubmission = ["Y'know the goal is to be funny, right?",
     "Not sure if I would have answered like that, but sure", 
@@ -135,12 +142,14 @@ const pregame = ["Well this is exciting, isn't it?",
 ]
 
 let responseString = '';
-
+//let promptToBeVotedOn = '';
 let targetResponses = 2; //how many responses the player will need, constant
 let currentResponse = 1;
 var promptsLeft = document.getElementById("promptsLeft");
 
 let votedfor = 0;
+
+let submittedThisRound = true;
 //let number = '';
 
 let currentlyAnswering = 1;
@@ -186,7 +195,7 @@ function updateGamePhase(phase){
     }
 }
 
-function newRealtimeListener()
+function newRealtimeListener() //basically reconnecting
 {
     //add code for detatching listeners here, none ye
     //unsubscribe();
@@ -197,6 +206,7 @@ function newRealtimeListener()
 
     var unsubscribe = db.collection(roomCode).doc("lobby controller").onSnapshot((doc) => {
         console.log("subbed to game controller and change made");
+        allPrompts = doc.data().Prompts;
         if(doc.data().GamePhase == 1){
             allPrompts = doc.data().Prompts;
             // var leftTurnOrder = doc.data().TurnOrderLeft; // reference to seperate turn orders removed
@@ -208,8 +218,28 @@ function newRealtimeListener()
 
             // console.log(leftTurnOrder);
             // console.log(rightTurnOrder);
-            setTimeout(getMyPrompts, 3000);
-            
+            setTimeout(getMyPrompts, 2000);
+        }
+        if(doc.data().GamePhase == 2){
+            //submissions ended
+            updateGamePhase(1);
+        }
+        if(doc.data().GamePhase == 3){ // for now 3 is going to be voting but might change
+            allResponses = doc.data().Responses;
+            //localStorage.setItem("votingOn",0);
+            if (localStorage.getItem("lastVotedOn") == doc.data().CurrentlyVotingOnPairing){
+                console.log("already voted")
+                funnymsg.innerHTML = aftervote[Math.floor(Math.random()*aftervote.length)];
+                
+                updateGamePhase(1);
+            } else
+            {
+                updateGamePhase(3);
+                if(doc.data().CurrentlyVotingOnPairing != localStorage.getItem("votingOn")){
+                    localStorage.setItem("votingOn",doc.data().CurrentlyVotingOnPairing);
+                }
+                refreshVotes();
+            }
         }
     });
 }
@@ -233,7 +263,82 @@ function getMyPrompts(){
         i++;
     });
     console.log(myPrompts);
+    targetResponses = myPrompts.length;
+    if(localStorage.getItem("currentlyAnswering") < 2)
+    {
+        localStorage.setItem("currentlyAnswering",1); 
+        currentResponse = 1;
+    }
+    else
+    {
+        currentResponse = localStorage.getItem("currentlyAnswering");
+    }
+
+    if(currentResponse != 100 && gamePhase != 3)
+    {
+        promptText.innerHTML = myPrompts[currentResponse - 1];
+        promptsLeft.innerHTML = (currentResponse + "/" + targetResponses);
+        updateGamePhase(2);
+    }
+
 }
+
+//voting
+function refreshVotes(){
+    //localStorage.getItem("votingOn")
+    updateGamePhase(3);
+    
+
+    //the prompt will just be equal to the number being voted on
+    var promptToBeVotedOn = allPrompts[localStorage.getItem("votingOn")-1];
+    //the responses will be at the ceiling og the index of voting on
+    var response1 = allResponses[(localStorage.getItem("votingOn")*2)-2];
+    var response2 = allResponses[(localStorage.getItem("votingOn")*2)-1];
+
+    console.log("Prompt to be voted on: ", promptToBeVotedOn, response1, response2);
+
+    votingPromptText.innerHTML = promptToBeVotedOn;
+    first.innerHTML = response1;
+    second.innerHTML = response2;
+}
+
+//vote buttons
+first.addEventListener('click', e => {
+    console.log('button clicked');
+    //console.log(e.srcElement.id);
+    justVoted(1);
+    var controllerRef = db.collection(localStorage.getItem("room")).doc("lobby controller");
+    controllerRef.update({
+        VotesFor1: firebase.firestore.FieldValue.arrayUnion(localStorage.getItem("playerNumber")) //at this point I realised, it might be easier to add to an array incase in the time I am reading then writing the data someone else votes, also means I could show players who voted for each other as a post dev feature.
+    });
+});
+
+second.addEventListener('click', e => {
+    console.log('button clicked');
+    justVoted(2);
+    //console.log(e.srcElement.id);
+    var controllerRef = db.collection(localStorage.getItem("room")).doc("lobby controller");
+    controllerRef.update({
+        VotesFor2: firebase.firestore.FieldValue.arrayUnion(localStorage.getItem("playerNumber")) //at this point I realised, it might be easier to add to an array incase in the time I am reading then writing the data someone else votes, also means I could show players who voted for each other as a post dev feature.
+    });
+});
+
+function justVoted(number){
+    localStorage.setItem("lastVotedOn",localStorage.getItem("votingOn"));
+
+    console.log(number);
+    funnymsg.innerHTML = aftervote[Math.floor(Math.random()*aftervote.length)];
+    updateGamePhase(1);
+    // var playerRef = db.collection(localStorage.getItem("room")).doc((0 + localStorage.getItem("playerNumber")).slice(-2));
+    // playerRef.update({
+    //     VotedFor: number
+    // });
+
+
+}
+
+
+
 
 function roomDoesNotExist(){
     text.innerHTML = 'Room does not exist'; 
@@ -301,9 +406,23 @@ form.addEventListener('submit', e => {
                     if(form.collectionName.value == localStorage.getItem("room"))
                     {
                         console.log('user rejoined');
-                        //roomCode = form.collectionName.value;
-                        updateGamePhase(2); //this will update to whatever phase the game is at the time, but for now this will be one
 
+                        text.innerHTML = 'Rejoining...'; 
+                        //roomCode = form.collectionName.value;
+
+                        if (localStorage.getItem("currentlyAnswering") != 100)
+                        {
+                            currentResponse = localStorage.getItem("currentlyAnswering");
+                            //updateGamePhase(2);
+                        } else
+                        {
+                            funnymsg.innerHTML = aftersubmission[Math.floor(Math.random()*aftersubmission.length)];
+                            updateGamePhase(1); //this will update to whatever phase the game is at the time, but for now this will be one
+                        }
+
+                        navbarCode.innerHTML = localStorage.getItem("room");
+                        navbarName.innerHTML = localStorage.getItem("name");
+                        navbarNumber.innerHTML = localStorage.getItem("playerNumber");
 
                         newRealtimeListener();
 
@@ -318,11 +437,11 @@ form.addEventListener('submit', e => {
                             
                             
                             
-                            
+                            localStorage.setItem("currentlyAnswering",0); 
                             navbarCode.innerHTML = form.collectionName.value;
                             navbarName.innerHTML = form.username.value;
 
-                            updateGamePhase(2); //gamephase 1
+                            updateGamePhase(1); //gamephase 1
                             setTimeout(deleteOldDoc, 5000);
                             return;
                         }).catch(err => {
@@ -346,35 +465,13 @@ form.addEventListener('submit', e => {
     if(roomCode == 'ABCD')
     {
         //console.log('This room does not exist');
-        setTimeout(roomDoesNotExist, 1000);
+        setTimeout(roomDoesNotExist, 3000);
     }
 
 
 });
 
-//vote buttons
-first.addEventListener('click', e => {
-    console.log('button clicked');
-    //console.log(e.srcElement.id);
-    justVoted(1);
-});
 
-second.addEventListener('click', e => {
-    console.log('button clicked');
-    justVoted(2);
-    //console.log(e.srcElement.id);
-    
-});
-
-function justVoted(number){
-    console.log(number);
-    funnymsg.innerHTML = aftervote[Math.floor(Math.random()*aftervote.length)];
-    updateGamePhase(1);
-    var playerRef = db.collection(localStorage.getItem("room")).doc((0 + localStorage.getItem("playerNumber")).slice(-2));
-    playerRef.update({
-        VotedFor: number
-    });
-}
 
 response.addEventListener('submit', e => {
     e.preventDefault(); //prevents the page from reloading
@@ -397,15 +494,19 @@ response.addEventListener('submit', e => {
 
 
     currentResponse++;
+    localStorage.setItem("currentlyAnswering",currentResponse); 
     response.response.value = "";
 
     promptsLeft.innerHTML = (currentResponse + "/" + targetResponses);
+    promptText.innerHTML = myPrompts[currentResponse - 1];
 
 
     if (currentResponse > targetResponses)
     {
         funnymsg.innerHTML = aftersubmission[Math.floor(Math.random()*aftersubmission.length)];
         updateGamePhase(1);
+        localStorage.setItem("currentlyAnswering",100); //currently answering 100 will mean player has submitted, as there will never be 100 prompts
+        //submittedThisRound = true;
     }
 
 
