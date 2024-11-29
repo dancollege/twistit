@@ -229,7 +229,7 @@ function newRealtimeListener() //basically reconnecting
             //localStorage.setItem("votingOn",0);
             if (localStorage.getItem("lastVotedOn") == doc.data().CurrentlyVotingOnPairing){
                 console.log("already voted")
-                funnymsg.innerHTML = aftervote[Math.floor(Math.random()*aftervote.length)];
+                //funnymsg.innerHTML = aftervote[Math.floor(Math.random()*aftervote.length)];
                 
                 updateGamePhase(1);
             } else
@@ -280,7 +280,6 @@ function getMyPrompts(){
         promptsLeft.innerHTML = (currentResponse + "/" + targetResponses);
         updateGamePhase(2);
     }
-
 }
 
 //voting
@@ -333,12 +332,7 @@ function justVoted(number){
     // playerRef.update({
     //     VotedFor: number
     // });
-
-
 }
-
-
-
 
 function roomDoesNotExist(){
     text.innerHTML = 'Room does not exist'; 
@@ -419,6 +413,7 @@ form.addEventListener('submit', e => {
                             funnymsg.innerHTML = aftersubmission[Math.floor(Math.random()*aftersubmission.length)];
                             updateGamePhase(1); //this will update to whatever phase the game is at the time, but for now this will be one
                         }
+                        //funnymsg.innerHTML = aftervote[Math.floor(Math.random()*aftervote.length)];
 
                         navbarCode.innerHTML = localStorage.getItem("room");
                         navbarName.innerHTML = localStorage.getItem("name");
