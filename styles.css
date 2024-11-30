@@ -85,6 +85,13 @@ div {
     /* transform: rotate(4deg); */
 }
 
+.signup{
+  font-size: 20px;
+}
+.preventResize{
+  font-size: 16px;
+}
+
 form {
     display: inline-block;
     margin-left: auto;
