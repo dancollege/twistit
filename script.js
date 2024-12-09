@@ -207,6 +207,7 @@ function newRealtimeListener() //basically reconnecting
     var unsubscribe = db.collection(roomCode).doc("lobby controller").onSnapshot((doc) => {
         console.log("subbed to game controller and change made");
         allPrompts = doc.data().Prompts;
+        fullTurnOrder = doc.data().TurnOrderFull;
         if(doc.data().GamePhase == 1){
             allPrompts = doc.data().Prompts;
             // var leftTurnOrder = doc.data().TurnOrderLeft; // reference to seperate turn orders removed
@@ -227,12 +228,18 @@ function newRealtimeListener() //basically reconnecting
         if(doc.data().GamePhase == 3){ // for now 3 is going to be voting but might change
             allResponses = doc.data().Responses;
             //localStorage.setItem("votingOn",0);
+            console.log(doc.data().TurnOrderFull[doc.data().CurrentlyVotingOnPairing * 2 - 2]);
             if (localStorage.getItem("lastVotedOn") == doc.data().CurrentlyVotingOnPairing){
                 console.log("already voted")
                 //funnymsg.innerHTML = aftervote[Math.floor(Math.random()*aftervote.length)];
                 
                 updateGamePhase(1);
-            } else
+            } else if (doc.data().TurnOrderFull[doc.data().CurrentlyVotingOnPairing * 2 - 2] == localStorage.getItem("playerNumber") || doc.data().TurnOrderFull[doc.data().CurrentlyVotingOnPairing * 2 - 1] == localStorage.getItem("playerNumber")){
+                console.log("this is my answer");
+                funnymsg.innerHTML = "This is your response... so no voting for u :)"
+                updateGamePhase(1);
+            }
+            else
             {
                 updateGamePhase(3);
                 if(doc.data().CurrentlyVotingOnPairing != localStorage.getItem("votingOn")){
