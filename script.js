@@ -248,6 +248,11 @@ function newRealtimeListener() //basically reconnecting
                 refreshVotes();
             }
         }
+        if(doc.data().GamePhase == 1000) //showing results
+        {
+            funnymsg.innerHTML = "Look up at the main screen!"
+            updateGamePhase(1);
+        }
     });
 }
 
