@@ -347,7 +347,13 @@ function justVoted(number){
 }
 
 function roomDoesNotExist(){
-    text.innerHTML = 'Room does not exist'; 
+    if (text.innerHTML != 'Please choose a different name')
+    {
+        text.innerHTML = 'Room does not exist'; 
+    }
+}
+function clearRoomDoesNotExist(){
+    text.innerHTML = ''; 
 }
 
 function deleteOldDoc(){
@@ -357,7 +363,7 @@ function deleteOldDoc(){
             localStorage.setItem("playerNumber",doc.data().PlayerNumber);
 
             myNumber = doc.data().PlayerNumber;
-            navbarNumber.innerHTML = myNumber;
+            navbarNumber.innerHTML = "PlayerNumber: " + myNumber;
             console.log("I am player " + myNumber)
 
             db.collection(localStorage.getItem("room")).doc(localStorage.getItem("name")).delete().then(() => {
@@ -403,6 +409,7 @@ form.addEventListener('submit', e => {
 
     //checking ig the room exists before adding the player
     db.collection("gameManager").doc("manager").get().then((doc) => {
+        clearRoomDoesNotExist();
         if (doc.exists) {
             lobbies = doc.data().currentLobbies;
             lobbies.forEach(lobby => { 
@@ -429,30 +436,54 @@ form.addEventListener('submit', e => {
 
                         navbarCode.innerHTML = localStorage.getItem("room");
                         navbarName.innerHTML = localStorage.getItem("name");
-                        navbarNumber.innerHTML = localStorage.getItem("playerNumber");
+                        navbarNumber.innerHTML = "PlayerNumber: " + localStorage.getItem("playerNumber");
 
                         newRealtimeListener();
 
                     } else{ //this prevents a new player from being made, and instead allows a player to rejoin
-                        db.collection(form.collectionName.value).doc(form.username.value).set(player).then(() => {
-                            console.log('user added');
-                            text.innerHTML = 'user added';
-                            localStorage.setItem("room", form.collectionName.value)
-                            localStorage.setItem("name", form.username.value)
+                        const docRef = db.collection(form.collectionName.value).doc(form.username.value.trim());
+                        var nameExists = false;
+                        db.collection(form.collectionName.value).where("PlayerName", "==", form.username.value.trim()) //.where(FieldPath.documentId(), "==", form.username.value)
+                        .get()
+                        .then((querySnapshot) => {
+                            querySnapshot.forEach((doc) => {
+                                // doc.data() is never undefined for query doc snapshots
+                                nameExists = true;
+                                console.log("Name exists");
+                            });
                             
-                            newRealtimeListener();
-                            
-                            
-                            
-                            localStorage.setItem("currentlyAnswering",0); 
-                            navbarCode.innerHTML = form.collectionName.value;
-                            navbarName.innerHTML = form.username.value;
+                            //THIS DOESN'T WORK, WILL NEED TO COMPARE TO A LIST OF PLAYER NAMES I MAKE
+                            if (nameExists == true) {
+                                //name already exists
+                                console.log("name already exists");
+                                text.innerHTML = 'Please choose a different name'; 
+                            } else {
+                                docRef.set(player).then(() => {
+                                    docRef.update({
+                                        PlayerName: form.username.value.trim(),
+                                    });
+                                    console.log('user added');
+                                    text.innerHTML = 'user added';
+                                    localStorage.setItem("room", form.collectionName.value)
+                                    localStorage.setItem("name", form.username.value.trim())
+                                    
+                                    newRealtimeListener();
+                                    
+                                    localStorage.setItem("currentlyAnswering",0); 
+                                    navbarCode.innerHTML = form.collectionName.value;
+                                    navbarName.innerHTML = form.username.value.trim();
+        
+                                    updateGamePhase(1); //gamephase 1
+                                    setTimeout(deleteOldDoc, 5000);
+                                    return;
+                                }).catch(err => {
+                                    console.log(err);
+                                });
+                            } 
 
-                            updateGamePhase(1); //gamephase 1
-                            setTimeout(deleteOldDoc, 5000);
-                            return;
-                        }).catch(err => {
-                            console.log(err);
+                        })
+                        .catch((error) => {
+                            console.log("Error getting documents: ", error);
                         });
                     }
                     
@@ -473,6 +504,7 @@ form.addEventListener('submit', e => {
     {
         //console.log('This room does not exist');
         setTimeout(roomDoesNotExist, 3000);
+        setTimeout(clearRoomDoesNotExist, 8000);
     }
 
 
@@ -495,7 +527,8 @@ response.addEventListener('submit', e => {
     //     Responses: firebase.firestore.FieldValue.arrayUnion(response.response.value)
     // });
     playerRef.update({
-        Responses: response.response.value
+        Responses: response.response.value,
+        LastResponseInt: currentResponse
     });
 
 

@@ -21,10 +21,10 @@
             <!-- br causes a line break! -->
 
             <label for="username">Name:</label> <br>
-            <input required type="text" id="username" class="preventResize" name="username" minlength="3" maxlength="12"> <br>
+            <input required type="text" id="username" class="preventResize" name="username" pattern="[A-Za-z0-9\s]+" minlength="3" maxlength="12" title="Alphanumeric characters only pls"> <br>
 
             <label for="collectionName">Room code:</label> <br>
-            <input type="text" id="collectionName" class="preventResize" name="collectionName" minlength="4" maxlength="4"> <br>
+            <input type="text" id="collectionName" class="preventResize" name="collectionName" pattern="[0-9]+" minlength="4" maxlength="4"> <br>
 
 
             <input type="submit" value="Join game!">
@@ -71,7 +71,7 @@
     <div id="navbar">
         <p id="code">Roomcode</p>
         <p id="name">Name</p>
-        <p id="number">PlayerNumber</p>
+        <p id="number">loading...</p>
     </div>
 
     
